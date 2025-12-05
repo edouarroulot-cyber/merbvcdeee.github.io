@@ -1,0 +1,2070 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combat Pokémon - TikFinity Ultimate Infini</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        @font-face {
+            font-family: 'Pokemon Solid';
+            src: url('https://fonts.cdnfonts.com/s/17890/Pokemon Solid.woff') format('woff');
+        }
+        @font-face {
+            font-family: 'Pokemon Hollow';
+            src: url('https://fonts.cdnfonts.com/s/17890/Pokemon Hollow.woff') format('woff');
+        }
+        body {
+            background-image: url('https://image.tmdb.org/t/p/original/yFMhCCM2y5DH8r600KHv1oOFyMo.jpg'), linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: cover, 400% 400%;
+            background-blend-mode: overlay;
+            background-attachment: fixed;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            padding-bottom: 50px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(27, 52, 143, 0.9), rgba(178, 31, 31, 0.9));
+            border-radius: 25px;
+            border: 6px solid #FFDE00;
+            box-shadow: 0 0 40px rgba(255, 222, 0, 0.5), inset 0 0 30px rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #FF0000, #FFDE00, #3B4CCA, #1a2a6c);
+            z-index: -1;
+            border-radius: 30px;
+            opacity: 0.5;
+            animation: borderGlow 3s linear infinite;
+        }
+        @keyframes borderGlow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        h1 {
+            color: #FFDE00;
+            margin-bottom: 10px;
+            font-size: 3.5rem;
+            text-shadow: 5px 5px 0 #3B4CCA, 10px 10px 0 rgba(0, 0, 0, 0.5);
+            font-family: 'Pokemon Solid', sans-serif;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #FFDE00, #FFCC00, #FF9900);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+        @keyframes titleGlow {
+            from { text-shadow: 5px 5px 0 #3B4CCA, 10px 10px 0 rgba(0, 0, 0, 0.5); }
+            to { text-shadow: 5px 5px 0 #3B4CCA, 10px 10px 0 rgba(0, 0, 0, 0.5), 0 0 20px #FFDE00; }
+        }
+        .subtitle {
+            color: #FFDE00;
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-shadow: 2px 2px 0 #3B4CCA;
+            font-family: 'Pokemon Hollow', sans-serif;
+            letter-spacing: 2px;
+        }
+        /* --- PANNEAUX DÉPLAÇABLES --- */
+        .draggable-panel {
+            position: fixed;
+            width: 550px;
+            min-height: 250px;
+            background: linear-gradient(135deg, rgba(27, 52, 143, 0.97), rgba(178, 31, 31, 0.97));
+            border: 6px solid #FFDE00;
+            border-radius: 25px;
+            box-shadow: 0 0 40px rgba(255, 222, 0, 0.9), inset 0 0 25px rgba(255, 255, 255, 0.15);
+            z-index: 1000;
+            overflow: hidden;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(15px);
+            font-size: 1.8em;
+        }
+        .panel-header {
+            padding: 20px 25px;
+            background: linear-gradient(90deg, #3b4cca, #1D2C5E, #b21f1f);
+            color: #FFDE00;
+            font-weight: bold;
+            cursor: move;
+            border-bottom: 6px solid #FFDE00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-shadow: 4px 4px 0 #000;
+            font-family: 'Pokemon Solid', sans-serif;
+            letter-spacing: 2px;
+            font-size: 2.4rem;
+        }
+        .panel-content {
+            padding: 25px;
+            font-size: 1.8rem;
+            max-height: 500px;
+            overflow-y: auto;
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        /* Positions par défaut */
+        #tikfinity-panel { top: 20px; left: 20px; }
+        #loot-history-panel { top: 20px; right: 20px; }
+        #history-panel { top: 350px; right: 20px; }
+        #debts-panel { top: 20px; left: 600px; width: 500px; }
+        #save-panel { top: 350px; left: 20px; }
+
+        .list-item {
+             padding: 15px 0;
+             border-bottom: 2px solid rgba(255, 222, 0, 0.5);
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+            transition: all 0.2s;
+            font-size: 1.8rem;
+        }
+        .list-item:hover {
+            background: rgba(255, 222, 0, 0.2);
+            padding-left: 10px;
+        }
+        .loot-item {
+             color: #FFDE00;
+             font-weight: bold;
+            background: rgba(59, 76, 202, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 8px 0;
+            font-size: 1.8rem;
+            border: 2px solid rgba(255, 222, 0, 0.6);
+        }
+        /* Bouton Payer */
+        .pay-btn {
+            background: linear-gradient(45deg, #4CAF50, #2E7D32);
+            border: 3px solid #FFDE00;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.6rem;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+        .pay-btn:hover {
+            background: linear-gradient(45deg, #2E7D32, #4CAF50);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
+        }
+        /* Boutons de sauvegarde */
+        .save-btn {
+            background: linear-gradient(45deg, #2196F3, #0D47A1);
+            border: 3px solid #FFDE00;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.6rem;
+            transition: all 0.3s;
+            margin: 5px;
+            width: 100%;
+        }
+        .save-btn:hover {
+            background: linear-gradient(45deg, #0D47A1, #2196F3);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(33, 150, 243, 0.8);
+        }
+        .save-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 3px solid #3B4CCA;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 1.6rem;
+        }
+        /* --- TIKFINITY --- */
+        .status-dot {
+             width: 20px;
+             height: 20px;
+             border-radius: 50%;
+             display: inline-block;
+             margin-right: 15px;
+            box-shadow: 0 0 15px currentColor;
+        }
+        .status-dot.connected {
+             background: #4CAF50;
+             box-shadow: 0 0 20px #4CAF50;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 18px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        .status-dot.disconnected {
+             background: #F44336;
+             box-shadow: 0 0 20px #F44336;
+        }
+        .connect-btn {
+            width: 100%;
+             padding: 20px;
+             margin-bottom: 20px;
+            background: linear-gradient(45deg, #3b4cca, #1D2C5E, #b21f1f);
+            border: 4px solid #FFDE00;
+             color: white;
+             border-radius: 15px;
+            cursor: pointer;
+             font-weight: bold;
+            font-family: 'Pokemon Hollow', sans-serif;
+            font-size: 2.1rem;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            text-shadow: 3px 3px 0 #000;
+        }
+
+        #resetBtn {
+            background: linear-gradient(45deg, #8B0000, #FF6347);
+            border-color: #FF4500;
+            margin-top: 15px;
+            font-size: 2.1rem;
+        }
+        #resetBtn:hover {
+            background: linear-gradient(45deg, #FF6347, #8B0000);
+            box-shadow: 0 8px 25px rgba(255, 69, 0, 0.9);
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(255, 222, 0, 0.8);
+            background: linear-gradient(45deg, #b21f1f, #3b4cca, #1D2C5E);
+        }
+        /* --- BOSS AU MILIEU SUPERPOSÉ --- */
+        .boss-overlay {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 500;
+            width: 800px;
+            height: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+        
+        .boss-image-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+        }
+        
+        .boss-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 50px rgba(255, 0, 0, 0.9));
+            animation: bossFloat 4s ease-in-out infinite;
+            transition: filter 0.3s ease;
+        }
+        
+        .boss-image.hit-anim {
+            filter: drop-shadow(0 0 80px rgba(255, 0, 0, 1)) brightness(1.5);
+            animation: bossHitFlash 0.5s ease-out;
+        }
+        
+        @keyframes bossFloat {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+            100% { transform: translateY(0px) scale(1); }
+        }
+        
+        @keyframes bossHitFlash {
+            0% { filter: drop-shadow(0 0 80px rgba(255, 0, 0, 1)) brightness(2) hue-rotate(0deg); }
+            25% { filter: drop-shadow(0 0 100px rgba(255, 0, 0, 1)) brightness(3) hue-rotate(30deg); }
+            50% { filter: drop-shadow(0 0 120px rgba(255, 50, 0, 1)) brightness(4) hue-rotate(60deg); }
+            75% { filter: drop-shadow(0 0 100px rgba(255, 0, 0, 1)) brightness(3) hue-rotate(30deg); }
+            100% { filter: drop-shadow(0 0 80px rgba(255, 0, 0, 1)) brightness(2) hue-rotate(0deg); }
+        }
+        
+        /* BARRE DE VIE CACHÉE - ENTIÈREMENT SUPPRIMÉE */
+        .boss-hp-container {
+            display: none;
+        }
+        
+        /* Récompense cachée */
+        .boss-reward-corner {
+            position: absolute;
+            top: -80px;
+            left: 20px;
+            z-index: 502;
+            width: 160px;
+            height: 160px;
+            border-radius: 20px;
+            border: 5px solid #FF0000;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.95);
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.9);
+            opacity: 0.95;
+            transition: all 0.3s;
+            pointer-events: auto;
+            cursor: pointer;
+            visibility: hidden;
+        }
+        
+        .boss-reward-corner.claimed {
+            border-color: #FFD700;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.9);
+            opacity: 1;
+            transform: scale(1.05);
+            animation: bossClaimedPulse 2s infinite;
+        }
+        
+        @keyframes bossClaimedPulse {
+            0% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.9); }
+            50% { box-shadow: 0 0 70px rgba(255, 215, 0, 0.9); }
+            100% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.9); }
+        }
+        
+        /* --- GRILLE POKEMON (ORIGINALE) --- */
+        .pokemon-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 60px;
+            max-width: 1400px;
+            margin: 0 auto 40px auto;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .pokemon-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(27, 52, 143, 0.8), rgba(178, 31, 31, 0.8));
+            border-radius: 30px;
+            padding: 30px 20px;
+            position: relative;
+            transition: all 0.3s;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(255, 255, 255, 0.1);
+            border: 5px solid #FFDE00;
+            overflow: hidden;
+            min-width: 500px;
+            z-index: 100;
+        }
+        
+        .pokemon-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #FF0000, #FFDE00, #3B4CCA, #1a2a6c);
+            z-index: -1;
+            border-radius: 32px;
+            opacity: 0.7;
+        }
+        
+        .pokemon-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 40px rgba(255, 222, 0, 0.6), inset 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+        
+        .pokemon-card.hit-anim {
+             animation: hitFlash 0.3s;
+             border-color: #FF0000;
+         }
+         
+        @keyframes hitFlash {
+            0% { background: rgba(178, 31, 31, 0.9); }
+            50% { background: rgba(255, 0, 0, 0.9); }
+            100% { background: linear-gradient(135deg, rgba(27, 52, 143, 0.8), rgba(178, 31, 31, 0.8)); }
+        }
+        
+        .pokemon-card.defeated {
+             filter: grayscale(0.9);
+             opacity: 0.7;
+             transform: scale(0.95);
+        }
+        
+        .pokemon-card.defeated::after {
+            content: "KO";
+             position: absolute;
+             top: 50%;
+             left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 8rem;
+             color: #FF0000;
+             font-family: 'Pokemon Solid', sans-serif;
+            text-shadow: 8px 8px 0 #000;
+             z-index: 20;
+            opacity: 0.8;
+        }
+        
+        /* NOMS ET PV CACHÉS */
+        .pokemon-name-tag, .hp-text-info, .reward-label {
+            display: none;
+         }
+         
+        /* IMAGE WRAPPER AGRANDI */
+        .pokemon-image-wrapper {
+            width: 480px;
+            height: 480px;
+            border-radius: 25px;
+            position: relative;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border: 6px solid #FFDE00;
+            box-shadow: 0 0 50px rgba(255, 222, 0, 0.8), inset 0 0 35px rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(59, 76, 202, 0.6));
+            transition: all 0.3s;
+        }
+        
+        .pokemon-image-wrapper:hover {
+            box-shadow: 0 0 70px rgba(255, 222, 0, 1), inset 0 0 50px rgba(255, 255, 255, 0.4);
+            transform: scale(1.03);
+        }
+        
+        /* --- RÉCOMPENSE EN HAUT À GAUCHE DE CHAQUE POKÉMON --- */
+        .pokemon-reward-corner {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            width: 140px;
+            height: 140px;
+            border-radius: 15px;
+            border: 5px solid #FFDE00;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.95);
+            box-shadow: 0 0 30px rgba(255, 222, 0, 0.8);
+            opacity: 0.95;
+            transition: all 0.3s;
+        }
+        
+        .pokemon-reward-corner:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(255, 222, 0, 1);
+        }
+        
+        .pokemon-reward-corner.claimed {
+            border-color: #4CAF50;
+            box-shadow: 0 0 35px rgba(76, 175, 80, 0.9);
+            opacity: 1;
+            transform: scale(1.05);
+            animation: claimedPulse 2s infinite;
+        }
+        
+        @keyframes claimedPulse {
+            0% { box-shadow: 0 0 35px rgba(76, 175, 80, 0.9); }
+            50% { box-shadow: 0 0 55px rgba(76, 175, 80, 0.9); }
+            100% { box-shadow: 0 0 35px rgba(76, 175, 80, 0.9); }
+        }
+        
+        .pokemon-reward-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Image principale du Pokémon */
+        .pokemon-main-img {
+             position: relative;
+            z-index: 2;
+            width: 100%;
+             height: 100%;
+             object-fit: cover;
+             filter: drop-shadow(0 0 30px rgba(255, 222, 0, 0.7));
+            transition: all 0.5s ease;
+        }
+        
+        .pokemon-image-wrapper:hover .pokemon-main-img {
+            transform: scale(1.2) rotate(5deg);
+            filter: drop-shadow(0 0 45px rgba(255, 222, 0, 1));
+        }
+        
+        /* --- BARRE DE VIE SANS CHIFFRES --- */
+        .hp-container {
+            width: 100%;
+             max-width: 450px;
+            background: rgba(0, 0, 0, 0.9);
+             padding: 25px;
+            border-radius: 25px;
+             border: 5px solid #3B4CCA;
+            box-shadow: 0 0 25px rgba(59, 76, 202, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 5;
+        }
+        
+        .hp-bar-wrapper {
+            position: relative;
+            height: 60px;
+            background: linear-gradient(to right, #333, #555);
+            border-radius: 30px;
+            border: 4px solid #FFDE00;
+            overflow: visible;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+        }
+        
+        .hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF0000, #FFCC00, #4CAF50);
+            border-radius: 30px;
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 100%;
+            box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hp-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shine 2s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* IMAGES BUTIN SUR LA BARRE */
+        .loot-marker {
+            position: absolute;
+            top: 50%;
+             transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #000;
+            border: 4px solid #FFDE00;
+            overflow: hidden;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.9);
+            transition: all 0.3s;
+        }
+        
+        .loot-marker:hover {
+            transform: translate(-50%, -50%) scale(1.25);
+            box-shadow: 0 0 30px rgba(255, 255, 0, 1);
+        }
+        
+        /* Effet "pris" */
+        .loot-marker.claimed {
+            filter: grayscale(100%);
+            border-color: #555;
+            opacity: 0.5;
+            transform: translate(-50%, -50%) scale(0.8);
+            box-shadow: none;
+        }
+        
+        .loot-marker img {
+            width: 100%;
+             height: 100%;
+             object-fit: cover;
+        }
+        
+        /* --- BOUTONS D'ATTAQUE (EN DESSOUS) --- */
+        .attack-section {
+             text-align: center;
+             margin-bottom: 50px;
+             margin-top: 30px;
+             position: relative;
+             z-index: 600;
+         }
+         
+        .attack-modes {
+             display: flex;
+             justify-content: center;
+             flex-wrap: wrap;
+             gap: 30px;
+             margin-bottom: 50px;
+         }
+         
+        .attack-mode-image {
+            background: linear-gradient(135deg, rgba(27, 52, 143, 0.9), rgba(178, 31, 31, 0.9));
+            border: 5px solid #3B4CCA;
+            border-radius: 25px;
+            padding: 25px;
+            cursor: pointer;
+            width: 180px;
+            transition: all 0.3s;
+            display: flex;
+             flex-direction: column;
+             align-items: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
+        
+        .attack-mode-image img {
+             width: 100px;
+             height: 100px;
+             object-fit: contain;
+             margin-bottom: 15px;
+             filter: drop-shadow(0 0 15px rgba(255, 222, 0, 0.7));
+        }
+        
+        .attack-mode-image:hover {
+             transform: translateY(-10px);
+             border-color: #FFDE00;
+             box-shadow: 0 18px 30px rgba(0,0,0,0.8), 0 0 25px rgba(255, 222, 0, 0.8);
+        }
+        
+        .attack-mode-image.active {
+             border-color: #FFDE00;
+             background: linear-gradient(135deg, rgba(255, 222, 0, 0.3), rgba(59, 76, 202, 0.95));
+            transform: scale(1.15);
+             box-shadow: 0 0 35px rgba(255, 222, 0, 1);
+        }
+        
+        .attack-mode-label {
+             font-weight: bold;
+             font-size: 1.4rem;
+             color: #FFDE00;
+            text-shadow: 2px 2px 0 #000;
+            font-family: 'Pokemon Hollow', sans-serif;
+            letter-spacing: 2px;
+        }
+        
+        .attack-button {
+            background: linear-gradient(135deg, #FF0000, #FFDE00, #3B4CCA, #1a2a6c);
+            color: white;
+             border: none;
+             padding: 35px 120px;
+             font-size: 3.5rem;
+            border-radius: 80px;
+             font-family: 'Pokemon Solid', sans-serif;
+             cursor: pointer;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 40px rgba(255, 222, 0, 0.8);
+             border: 8px solid #fff;
+            text-shadow: 5px 5px 0 #000;
+            letter-spacing: 4px;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .attack-button::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #FF0000, #FFDE00, #3B4CCA, #1a2a6c);
+            z-index: -1;
+            border-radius: 90px;
+            opacity: 0.7;
+            animation: borderGlow 3s linear infinite;
+        }
+        
+        .attack-button:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9), 0 0 50px rgba(255, 222, 0, 1);
+        }
+        
+        .attack-button:active {
+             transform: scale(0.95);
+             box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 20px rgba(255, 222, 0, 0.7);
+        }
+        
+        /* --- MENU RÉCOMPENSES (TOUT EN BAS) --- */
+        .rewards-section {
+             background: linear-gradient(135deg, rgba(27, 52, 143, 0.98), rgba(178, 31, 31, 0.98));
+             padding: 60px;
+             margin-top: 80px;
+             border-top: 10px solid #FFDE00;
+            border-radius: 35px;
+            box-shadow: 0 0 50px rgba(255, 222, 0, 0.6), inset 0 0 35px rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 600;
+        }
+        
+        .rewards-section::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, #FF0000, #FFDE00, #3B4CCA, #1a2a6c);
+            z-index: -1;
+            border-radius: 40px;
+            opacity: 0.7;
+        }
+        
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .reward-card {
+            background: linear-gradient(135deg, rgba(59, 76, 202, 0.7), rgba(29, 44, 94, 0.7));
+            border: 4px solid #3B4CCA;
+            border-radius: 25px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            opacity: 0.9;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+        }
+        
+        .reward-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 18px 30px rgba(0,0,0,0.9);
+            opacity: 1;
+        }
+        
+        .reward-card.claimed {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.9), rgba(56, 142, 60, 0.9));
+            border-color: #4CAF50;
+            opacity: 1;
+            box-shadow: 0 0 30px #4CAF50;
+            animation: claimedPulse 2s infinite;
+        }
+        
+        .reward-boss-card {
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.8), rgba(75, 0, 130, 0.8));
+            border: 5px solid #FF0000;
+            border-radius: 30px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            opacity: 0.9;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        
+        .reward-boss-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(0,0,0,1), 0 0 40px rgba(255, 0, 0, 0.7);
+            opacity: 1;
+        }
+        
+        .reward-boss-card.claimed {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(218, 165, 32, 0.9));
+            border-color: #FFD700;
+            opacity: 1;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.9);
+            animation: bossClaimedPulse 2s infinite;
+        }
+        
+        .reward-image img {
+             width: 120px;
+             height: 120px;
+             border-radius: 18px;
+            margin-right: 25px;
+             border: 4px solid #FFDE00;
+             background: #000;
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(255, 222, 0, 0.7);
+        }
+        
+        .reward-boss-image img {
+            width: 140px;
+            height: 140px;
+            border-radius: 20px;
+            margin-right: 30px;
+            border: 5px solid #FF0000;
+            background: #000;
+            object-fit: cover;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+        }
+        
+        .reward-info h3 {
+             font-size: 1.8rem;
+            margin-bottom: 10px;
+             color: #FFDE00;
+             text-shadow: 3px 3px 0 #000;
+            font-family: 'Pokemon Solid', sans-serif;
+            letter-spacing: 2px;
+        }
+        
+        .reward-boss-info h3 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: #FF0000;
+            text-shadow: 4px 4px 0 #000;
+            font-family: 'Pokemon Solid', sans-serif;
+            letter-spacing: 3px;
+        }
+        
+        .reward-info p {
+             font-size: 1.4rem;
+             color: #fff;
+             margin: 0;
+             font-weight: bold;
+             text-shadow: 2px 2px 0 #000;
+        }
+        
+        .reward-boss-info p {
+            font-size: 1.8rem;
+            color: #FFD700;
+            margin: 0;
+            font-weight: bold;
+            text-shadow: 3px 3px 0 #000;
+        }
+        
+        /* --- ANIMATIONS --- */
+        .damage-animation {
+            position: absolute;
+             color: #FF0000;
+             font-weight: 900;
+             font-size: 4.5rem;
+            pointer-events: none;
+             z-index: 100;
+             text-shadow: 4px 4px 0 #fff, 8px 8px 0 rgba(0, 0, 0, 0.8);
+            animation: floatUp 1s forwards;
+            font-family: 'Pokemon Solid', sans-serif;
+        }
+        
+        .boss-damage-animation {
+            position: absolute;
+            color: #FF0000;
+            font-weight: 900;
+            font-size: 6rem;
+            pointer-events: none;
+            z-index: 510;
+            text-shadow: 5px 5px 0 #fff, 10px 10px 0 rgba(0, 0, 0, 0.8);
+            animation: floatUp 1s forwards;
+            font-family: 'Pokemon Solid', sans-serif;
+        }
+        
+        .reward-animation {
+            position: absolute;
+             color: #FFDE00;
+             font-weight: 900;
+             font-size: 3.5rem;
+            pointer-events: none;
+             z-index: 101;
+             text-shadow: 4px 4px 0 #000, 8px 8px 0 rgba(0, 0, 0, 0.8);
+            animation: floatUp 1.5s forwards;
+            font-family: 'Pokemon Solid', sans-serif;
+        }
+        
+        .boss-reward-animation {
+            position: absolute;
+            color: #FFD700;
+            font-weight: 900;
+            font-size: 5rem;
+            pointer-events: none;
+            z-index: 511;
+            text-shadow: 5px 5px 0 #000, 10px 10px 0 rgba(0, 0, 0, 0.8);
+            animation: floatUp 1.5s forwards;
+            font-family: 'Pokemon Solid', sans-serif;
+        }
+        
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            50% { opacity: 1; transform: translateY(-70px) scale(1.3); }
+            100% { opacity: 0; transform: translateY(-120px) scale(1); }
+        }
+        
+        /* Mobile */
+        @media (max-width: 900px) {
+            .boss-overlay {
+                width: 500px;
+                height: 500px;
+                top: 40%;
+            }
+            
+            .boss-hp-container {
+                display: none;
+            }
+            
+            .pokemon-grid { grid-template-columns: 1fr; }
+            .pokemon-card { min-width: auto; }
+            .pokemon-image-wrapper { width: 100%; max-width: 400px; height: 400px; }
+            .pokemon-reward-corner { width: 100px; height: 100px; }
+            .attack-button { padding: 25px 70px; font-size: 2.5rem; }
+            .rewards-grid { grid-template-columns: 1fr; }
+            .draggable-panel { position: static; width: 100%; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- BOSS SUPERPOSÉ AU CENTRE - BARRE DE VIE ET RÉCOMPENSE CACHÉES -->
+    <div class="boss-overlay" id="boss-overlay">
+        <div class="boss-image-container">
+            <img class="boss-image" id="boss-image" src="https://i.pinimg.com/originals/13/57/33/135733b07291badc8cb3c083d4fd90b0.gif" alt="BOSS FINAL">
+        </div>
+        <!-- Récompense cachée -->
+        <div class="boss-reward-corner" id="reward-corner-boss" style="visibility: hidden;">
+            <img src="https://i.ibb.co/JR5SS5vd/IMG-6570.png" alt="BOSS KO Reward">
+        </div>
+        <!-- Barre de vie entièrement cachée -->
+        <div class="boss-hp-container" style="display: none;">
+            <div class="hp-text-info" id="hp-boss-text" style="display:none;">500000 / 500000</div>
+            <div class="boss-hp-bar-wrapper">
+                <div class="boss-hp-fill" id="hp-boss-bar" style="width: 100%"></div>
+                <div class="boss-loot-marker" id="pb-boss-75" style="left: 75%;">
+                    <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg0ZzBhbGRxOHRhNGVwcGhtMDJvZDk5NG9vdDNxMGx5dCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot Boss 75">
+                </div>
+                <div class="boss-loot-marker" id="pb-boss-50" style="left: 50%;">
+                    <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg0ZzBhbGRxOHRhNGVwcGhtMDJvZDk5NG9vdDNxMGx5dCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot Boss 50">
+                </div>
+                <div class="boss-loot-marker" id="pb-boss-25" style="left: 25%;">
+                    <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg0ZzBhbGRxOHRhNGVwcGhtMDJvZDk5NG9vdDNxMGx5dCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot Boss 25">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="draggable-panel" id="tikfinity-panel">
+        <div class="panel-header">
+            <span>📡 TikFinity Live</span>
+            <i class="fas fa-arrows-alt"></i>
+        </div>
+        <div class="panel-content">
+            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                <span class="status-dot disconnected" id="status-dot"></span>
+                <span id="status-text" style="font-size: 1.8rem;">Déconnecté</span>
+            </div>
+            <button class="connect-btn" id="connectBtn">Connexion au Live</button>
+            <button class="connect-btn" id="resetBtn">💥 Réinitialiser le Jeu et les Scores</button>
+            <div style="font-weight: bold; color:#FFDE00; margin-top:25px; font-size: 2.1rem;">🚀 File d'attente (<span id="queue-count">0</span>)</div>
+            <div id="queue-list" style="margin-top:20px;">
+                <div style="color: #aaa; font-style:italic; padding: 15px; text-align: center; font-size: 1.8rem;">En attente d'attaques...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="draggable-panel" id="debts-panel">
+        <div class="panel-header">
+            <span>💰 Dettes à Payer</span>
+            <i class="fas fa-arrows-alt"></i>
+        </div>
+        <div class="panel-content" id="debts-content">
+            <div class="list-item">Aucune dette enregistrée.</div>
+        </div>
+    </div>
+
+    <div class="draggable-panel" id="loot-history-panel">
+        <div class="panel-header">
+            <span>💰 Historique des Butins Spéciaux</span>
+            <i class="fas fa-arrows-alt"></i>
+        </div>
+        <div class="panel-content" id="loot-content">
+            <div class="list-item">En attente de drops...</div>
+        </div>
+    </div>
+    
+    <div class="draggable-panel" id="save-panel">
+        <div class="panel-header">
+            <span>💾 Sauvegarde & Statistiques</span>
+            <i class="fas fa-arrows-alt"></i>
+        </div>
+        <div class="panel-content">
+            <div style="margin-bottom: 20px;">
+                <h3 style="color:#FFDE00; margin-bottom: 10px; font-size: 2.1rem;">📊 PV des Pokémon</h3>
+                <div id="pokemon-hp-list" style="margin-bottom: 20px;">
+                    <!-- Les PV seront injectés ici -->
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="color:#FFDE00; margin-bottom: 10px; font-size: 2.1rem;">💾 Sauvegarde par Fichier</h3>
+                <button class="save-btn" id="exportBtn">
+                    <i class="fas fa-download"></i> Exporter la Sauvegarde
+                </button>
+                <input type="file" id="importFile" class="save-input" accept=".json" style="display: none;">
+                <button class="save-btn" id="importBtn">
+                    <i class="fas fa-upload"></i> Importer une Sauvegarde
+                </button>
+                <div id="save-status" style="margin-top: 10px; text-align: center; color: #FFDE00; font-size: 1.6rem;"></div>
+            </div>
+            
+            <div>
+                <h3 style="color:#FFDE00; margin-bottom: 10px; font-size: 2.1rem;">🏆 Top 3 des Dresseurs</h3>
+                <div id="top3-content">
+                    <div class="list-item">Aucun gain enregistré.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="draggable-panel" id="history-panel">
+        <div class="panel-header">
+            <span>📜 Journal de Combat</span>
+            <i class="fas fa-arrows-alt"></i>
+        </div>
+        <div class="panel-content" id="history-content">
+            <div class="list-item">Le combat Pokémon commence !</div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>⚡ POKÉMON COMBAT LIVE ⚡</h1>
+            <p class="subtitle">BOSS FINAL AU CENTRE ! 500K HP - Récompense : 30 000 pièces !</p>
+        </header>
+
+        <!-- GRILLE DES 4 POKÉMON ORIGINAUX -->
+        <div class="pokemon-grid">
+            <div class="pokemon-card" id="pokemon1">
+                <div class="pokemon-reward-corner" id="reward-corner-1">
+                    <img src="https://i.ibb.co/SDvhSDT8/IMG-7785-Photoroom.png" alt="KO Reward">
+                </div>
+                <div class="pokemon-name-tag" style="display:none;">PIKACHU GÉANT</div>
+                <div class="pokemon-image-wrapper">
+                    <img class="pokemon-main-img" src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbm9nZXd6MHRxYTd4Z2drMWNtdTlqZWlwazMyYnSxbWllczg3dXlraSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/PNQZWo7wZi3tfQ2NrY/giphy.gif" alt="Pikachu 1">
+                </div>
+                <div class="hp-container">
+                    <div class="hp-text-info" id="hp1-text" style="display:none;">25000 / 25000</div>
+                    <div class="hp-bar-wrapper">
+                        <div class="hp-fill" id="hp1-bar" style="width: 100%"></div>
+                        <div class="loot-marker" id="pb1-75" style="left: 75%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 75">
+                        </div>
+                        <div class="loot-marker" id="pb1-50" style="left: 50%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 50">
+                        </div>
+                        <div class="loot-marker" id="pb1-25" style="left: 25%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 25">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pokemon-card" id="pokemon2">
+                <div class="pokemon-reward-corner" id="reward-corner-2">
+                    <img src="https://i.ibb.co/Y7HjdxjB/IMG-7786-1-Photoroom.png" alt="KO Reward">
+                </div>
+                <div class="pokemon-name-tag" style="display:none;">PIKACHU NORMAL</div>
+                <div class="pokemon-image-wrapper">
+                    <img class="pokemon-main-img" src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjVscHg2Zm5jZGRyOHFwMDZneWRkem1tOWNjMGwyeWxraG96bmxkNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3qskGhbgAopbBqPL83/giphy.gif" alt="Pikachu 2">
+                </div>
+                <div class="hp-container">
+                    <div class="hp-text-info" id="hp2-text" style="display:none;">10000 / 10000</div>
+                    <div class="hp-bar-wrapper">
+                        <div class="hp-fill" id="hp2-bar" style="width: 100%"></div>
+                        <div class="loot-marker" id="pb2-75" style="left: 75%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 75">
+                        </div>
+                        <div class="loot-marker" id="pb2-50" style="left: 50%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 50">
+                        </div>
+                        <div class="loot-marker" id="pb2-25" style="left: 25%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 25">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pokemon-card" id="pokemon3">
+                <div class="pokemon-reward-corner" id="reward-corner-3">
+                    <img src="https://i.ibb.co/0pjVfMTt/IMG-6165.png" alt="KO Reward">
+                </div>
+                <div class="pokemon-name-tag" style="display:none;">PIKACHU MOYEN</div>
+                <div class="pokemon-image-wrapper">
+                    <img class="pokemon-main-img" src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3Z3eWY2bHQ0NTVsZ2U0cm9mY2Rvcjk0Y2pjYWRpamFtNnZqMDJ5aCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/WTR7vXpQEbtVkRZ6A8/giphy.gif" alt="Pikachu 3">
+                </div>
+                <div class="hp-container">
+                    <div class="hp-text-info" id="hp3-text" style="display:none;">5000 / 5000</div>
+                    <div class="hp-bar-wrapper">
+                        <div class="hp-fill" id="hp3-bar" style="width: 100%"></div>
+                        <div class="loot-marker" id="pb3-75" style="left: 75%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 75">
+                        </div>
+                        <div class="loot-marker" id="pb3-50" style="left: 50%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 50">
+                        </div>
+                        <div class="loot-marker" id="pb3-25" style="left: 25%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 25">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pokemon-card" id="pokemon4">
+                <div class="pokemon-reward-corner" id="reward-corner-4">
+                    <img src="https://i.ibb.co/C5M6DHcS/IMG-7356-Photoroom.png" alt="KO Reward">
+                </div>
+                <div class="pokemon-name-tag" style="display:none;">PIKACHU FACILE</div>
+                <div class="pokemon-image-wrapper">
+                    <img class="pokemon-main-img" src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXpzeG0yd3F5MGZ6OHo5NmpocmdsMm9wZ3JhZDkycTVpeGUwOXMwYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3FoBTGKkf1iBCdc1ns/giphy.gif" alt="Pikachu 4">
+                </div>
+                <div class="hp-container">
+                    <div class="hp-text-info" id="hp4-text" style="display:none;">2000 / 2000</div>
+                    <div class="hp-bar-wrapper">
+                        <div class="hp-fill" id="hp4-bar" style="width: 100%"></div>
+                        <div class="loot-marker" id="pb4-75" style="left: 75%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 75">
+                        </div>
+                        <div class="loot-marker" id="pb4-50" style="left: 50%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 50">
+                        </div>
+                        <div class="loot-marker" id="pb4-25" style="left: 25%;">
+                            <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 25">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="attack-section">
+            <div class="attack-modes">
+                <div id="mode1" class="attack-mode-image active" onclick="setMode(1)">
+                    <img src="https://i.ibb.co/WNXDxn2y/IMG-7354-Photoroom.png" alt="Rose">
+                    <div class="attack-mode-label">1 COUP</div>
+                </div>
+                <div id="mode10" class="attack-mode-image" onclick="setMode(10)">
+                    <img src="https://i.ibb.co/7JsBRrCn/IMG-5885.png" alt="Rosa">
+                    <div class="attack-mode-label">10 COUPS</div>
+                </div>
+                <div id="mode30" class="attack-mode-image" onclick="setMode(30)">
+                    <img src="https://i.ibb.co/8DMJ0cxy/IMG-7355-Photoroom.png" alt="Donuts">
+                    <div class="attack-mode-label">30 COUPS</div>
+                </div>
+                <div id="mode100" class="attack-mode-image" onclick="setMode(100)">
+                    <img src="https://i.ibb.co/C5M6DHcS/IMG-7356-Photoroom.png" alt="Coeurs">
+                    <div class="attack-mode-label">100 COUPS</div>
+                </div>
+                <div id="mode500" class="attack-mode-image" onclick="setMode(500)">
+                    <img src="https://i.ibb.co/nNy17WfL/IMG-6065.png" alt="Mini Gun">
+                    <div class="attack-mode-label">500 COUPS</div>
+                </div>
+                <div id="mode1000" class="attack-mode-image" onclick="setMode(1000)">
+                    <img src="https://i.ibb.co/JMPfpWV/IMG-5851.png" alt="Galaxie">
+                    <div class="attack-mode-label">1000 COUPS</div>
+                </div>
+                <div id="mode5000" class="attack-mode-image" onclick="setMode(5000)">
+                    <img src="https://i.ibb.co/hxXnkQh7/IMG-5861.png" alt="Coffre">
+                    <div class="attack-mode-label">5000 COUPS</div>
+                </div>
+            </div>
+
+            <button class="attack-button" id="manualAttackBtn">
+                <i class="fas fa-bolt"></i> ATTAQUER (1)
+            </button>
+        </div>
+
+        <div class="rewards-section">
+            <h2 style="color:#FFDE00; text-align:center; font-family:'Pokemon Solid'; font-size:3.2rem; text-shadow:4px 4px 0 #3B4CCA, 8px 8px 0 rgba(0, 0, 0, 0.5); margin-bottom:50px; letter-spacing: 4px;">🎁 MENU DES RÉCOMPENSES 🎁</h2>
+            <div class="rewards-grid">
+                <!-- Carte BOSS -->
+                <div class="reward-boss-card" id="reward-boss-final">
+                    <div class="reward-boss-image">
+                        <img src="https://i.ibb.co/JR5SS5vd/IMG-6570.png" alt="BOSS KO">
+                    </div>
+                    <div class="reward-boss-info">
+                        <h3>BOSS FINAL KO (500K)</h3>
+                        <p style="color:#FFD700; font-size: 2.2rem;">30 000 pièces</p>
+                        <p style="color:#fff; font-size: 1.4rem; margin-top: 5px;">Récompense Ultime !</p>
+                    </div>
+                </div>
+                
+                <div class="reward-card" id="reward1-75"><div class="reward-image"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 75"></div><div class="reward-info"><h3>PIKACHU GÉANT 75%</h3><p>50-150 pièces</p></div></div>
+                <div class="reward-card" id="reward1-50"><div class="reward-image"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 50"></div><div class="reward-info"><h3>PIKACHU GÉANT 50%</h3><p>50-150 pièces</p></div></div>
+                <div class="reward-card" id="reward1-25"><div class="reward-image"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 25"></div><div class="reward-info"><h3>PIKACHU GÉANT 25%</h3><p>50-150 pièces</p></div></div>
+                <div class="reward-card" id="reward1-final"><div class="reward-image"><img src="https://i.ibb.co/SDvhSDT8/IMG-7785-Photoroom.png" alt="KO 1"></div><div class="reward-info"><h3>PIKACHU GÉANT KO (25K)</h3><p style="color:#FFDE00; font-size: 1.5rem;">3000 pièces</p></div></div>
+
+                <div class="reward-card" id="reward2-final"><div class="reward-image"><img src="https://i.ibb.co/Y7HjdxjB/IMG-7786-1-Photoroom.png" alt="KO 2"></div><div class="reward-info"><h3>PIKACHU NORMAL KO (10K)</h3><p style="color:#FFDE00; font-size: 1.5rem;">1088 pièces</p></div></div>
+                <div class="reward-card" id="reward3-final"><div class="reward-image"><img src="https://i.ibb.co/0pjVfMTt/IMG-6165.png" alt="KO 3"></div><div class="reward-info"><h3>PIKACHU MOYEN KO (5K)</h3><p style="color:#FFDE00; font-size: 1.5rem;">500 pièces</p></div></div>
+                <div class="reward-card" id="reward4-final"><div class="reward-image"><img src="https://i.ibb.co/C5M6DHcS/IMG-7356-Photoroom.png" alt="KO 4"></div><div class="reward-info"><h3>PIKACHU FACILE KO (2K)</h3><p style="color:#FFDE00; font-size: 1.5rem;">100 pièces</p></div></div>
+
+                <div class="reward-card" id="reward2-75"><div class="reward-image"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 75"></div><div class="reward-info"><h3>PIKACHU NORMAL 75%</h3><p>30-90 pièces</p></div></div>
+                <div class="reward-card" id="reward3-50"><div class="reward-image"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot 50"></div><div class="reward-info"><h3>PIKACHU MOYEN 50%</h3><p>20-60 pièces</p></div></div>
+
+                <!-- Cartes de récompenses BOSS -->
+                <div class="reward-card" id="reward-boss-75"><div class="reward-image"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot Boss 75"></div><div class="reward-info"><h3>BOSS 75%</h3><p>2000-6000 pièces</p></div></div>
+                <div class="reward-card" id="reward-boss-50"><div class="reward-image"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot Boss 50"></div><div class="reward-info"><h3>BOSS 50%</h3><p>2000-6000 pièces</p></div></div>
+                <div class="reward-card" id="reward-boss-25"><div class="reward-image"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmozMGlyNTg4MGRlNTF2MnJtamV0NHh4c2x2NW4yc3V1YXJwaG02dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/b6gz53TNxTwIl0j5qd/giphy.gif" alt="Loot Boss 25"></div><div class="reward-info"><h3>BOSS 25%</h3><p>2000-6000 pièces</p></div></div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        // --- DONNÉES DU JEU ---
+        const INITIAL_POKEMONS_DATA = [
+            {
+                 id: 1, name: "PIKACHU GÉANT", maxHp: 25000, currentHp: 25000,
+                 milestones: {75: false, 50: false, 25: false},
+                rewards: {
+                    75: {min: 50, max: 150},
+                    50: {min: 50, max: 150},
+                    25: {min: 50, max: 150},
+                    0: {val: 3000}
+                }
+            },
+            {
+                 id: 2, name: "PIKACHU NORMAL", maxHp: 10000, currentHp: 10000,
+                 milestones: {75: false, 50: false, 25: false},
+                rewards: {
+                    75: {min: 30, max: 90},
+                    50: {min: 30, max: 90},
+                    25: {min: 30, max: 90},
+                    0: {val: 1088}
+                }
+            },
+            {
+                 id: 3, name: "PIKACHU MOYEN", maxHp: 5000, currentHp: 5000,
+                 milestones: {75: false, 50: false, 25: false},
+                rewards: {
+                    75: {min: 20, max: 60},
+                    50: {min: 20, max: 60},
+                    25: {min: 20, max: 60},
+                    0: {val: 500}
+                }
+            },
+            {
+                 id: 4, name: "PIKACHU FACILE", maxHp: 2000, currentHp: 2000,
+                 milestones: {75: false, 50: false, 25: false},
+                rewards: {
+                    75: {min: 10, max: 30},
+                    50: {min: 10, max: 30},
+                    25: {min: 10, max: 30},
+                    0: {val: 100}
+                }
+            },
+            // BOSS AVEC 500 000 HP
+            {
+                 id: "boss", name: "BOSS FINAL - MEWTWO MÉGA", maxHp: 500000, currentHp: 500000,
+                 milestones: {75: false, 50: false, 25: false},
+                rewards: {
+                    75: {min: 2000, max: 6000},
+                    50: {min: 2000, max: 6000},
+                    25: {min: 2000, max: 6000},
+                    0: {val: 30000}
+                }
+            }
+        ];
+
+        let pokemons = JSON.parse(JSON.stringify(INITIAL_POKEMONS_DATA));
+        let userWallet = {};
+        let userDebts = {};
+        let currentAttackMode = 1;
+        let tikfinitySocket = null;
+        let isConnected = false;
+        let attackQueue = [];
+        let isProcessingQueue = false;
+
+        // --- CONSTANTES SONORES ---
+        const LOOT_SOUND_URL = 'https://files.catbox.moe/m7ljju.mp3';
+        const KO_SOUND_URL = 'https://files.catbox.moe/522ozu.mp3';
+        const BOSS_SOUND_URL = 'https://files.catbox.moe/m7ljju.mp3';
+
+        function playSound(url) {
+            const audio = new Audio(url);
+            audio.volume = 0.5;
+            audio.play().catch(e => console.error("Erreur de lecture audio:", e));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGameData();
+            setupDraggables();
+            document.getElementById('manualAttackBtn').addEventListener('click', () => {
+                performAttack(currentAttackMode, "Moi (Click)");
+            });
+            document.getElementById('connectBtn').addEventListener('click', toggleConnection);
+            document.getElementById('resetBtn').addEventListener('click', resetGame);
+            document.getElementById('exportBtn').addEventListener('click', exportSave);
+            document.getElementById('importBtn').addEventListener('click', () => {
+                document.getElementById('importFile').click();
+            });
+            document.getElementById('importFile').addEventListener('change', importSave);
+            
+            pokemons.forEach(p => {
+                updatePokemonDisplay(p);
+            });
+            updateTop3();
+            updateDebtsPanel();
+            updatePokemonHPList();
+        });
+
+        // --- GESTION DES DONNÉES ---
+        function saveGameData() {
+            const data = {
+                pokemons: pokemons,
+                userWallet: userWallet,
+                userDebts: userDebts
+            };
+            try {
+                localStorage.setItem('pokemonBattleSave', JSON.stringify(data));
+                console.log("Jeu sauvegardé.");
+            } catch (e) {
+                console.error("Erreur lors de la sauvegarde:", e);
+            }
+        }
+
+        function loadGameData() {
+            try {
+                const savedData = localStorage.getItem('pokemonBattleSave');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    pokemons = data.pokemons;
+                    userWallet = data.userWallet || {};
+                    userDebts = data.userDebts || {};
+                    pokemons.forEach(p => updatePokemonDisplay(p));
+                    console.log("Jeu chargé.");
+                    showSaveStatus("Sauvegarde chargée avec succès !", "success");
+                } else {
+                    console.log("Aucune sauvegarde trouvée, initialisation du jeu.");
+                }
+            } catch (e) {
+                console.error("Erreur lors du chargement:", e);
+                resetPokemonsVisualsAndData();
+            }
+        }
+
+        function resetPokemonsVisualsAndData() {
+            pokemons = JSON.parse(JSON.stringify(INITIAL_POKEMONS_DATA));
+            pokemons.forEach(p => {
+                if (p.id === "boss") {
+                    document.getElementById(`reward-corner-boss`).classList.remove('claimed');
+                    document.getElementById(`reward-boss-final`).classList.remove('claimed');
+                } else {
+                    const card = document.getElementById(`pokemon${p.id}`);
+                    if (card) {
+                        card.classList.remove('defeated');
+                        card.classList.remove('hit-anim');
+                    }
+                    
+                    document.getElementById(`reward-corner-${p.id}`).classList.remove('claimed');
+                    document.getElementById(`reward${p.id}-final`).classList.remove('claimed');
+                }
+                
+                [75, 50, 25].forEach(tier => {
+                    if (p.id === "boss") {
+                        const marker = document.getElementById(`pb-boss-${tier}`);
+                        const rewardCard = document.getElementById(`reward-boss-${tier}`);
+                        if (marker) marker.classList.remove('claimed');
+                        if (rewardCard) rewardCard.classList.remove('claimed');
+                    } else {
+                        const marker = document.getElementById(`pb${p.id}-${tier}`);
+                        const rewardCard = document.getElementById(`reward${p.id}-${tier}`);
+                        if (marker) marker.classList.remove('claimed');
+                        if (rewardCard) rewardCard.classList.remove('claimed');
+                    }
+                });
+                updatePokemonDisplay(p);
+            });
+        }
+
+        function resetGame() {
+            if (confirm("Êtes-vous sûr de vouloir réinitialiser TOUTES les données du jeu (PV, Milestones, Scores) ? Cette action est irréversible.")) {
+                userWallet = {};
+                userDebts = {};
+                resetPokemonsVisualsAndData();
+                addToHistory("💥 Jeu réinitialisé. Les scores et PV sont à zéro.");
+                updateTop3();
+                updateDebtsPanel();
+                updatePokemonHPList();
+                localStorage.removeItem('pokemonBattleSave');
+                console.log("Jeu réinitialisé avec succès.");
+                showSaveStatus("Jeu réinitialisé avec succès !", "success");
+            }
+        }
+
+        // --- SAUVEGARDE PAR FICHIER ---
+        function exportSave() {
+            const data = {
+                pokemons: pokemons,
+                userWallet: userWallet,
+                userDebts: userDebts,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `pokemon-battle-save-${new Date().toISOString().slice(0,10)}.json`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            URL.revokeObjectURL(url);
+            showSaveStatus("Sauvegarde exportée avec succès !", "success");
+        }
+
+        function importSave(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.pokemons || !Array.isArray(data.pokemons)) {
+                        throw new Error("Format de fichier invalide");
+                    }
+                    
+                    pokemons = data.pokemons;
+                    userWallet = data.userWallet || {};
+                    userDebts = data.userDebts || {};
+                    
+                    pokemons.forEach(p => updatePokemonDisplay(p));
+                    updateTop3();
+                    updateDebtsPanel();
+                    updatePokemonHPList();
+                    
+                    saveGameData();
+                    
+                    showSaveStatus("Sauvegarde importée avec succès !", "success");
+                    addToHistory("💾 Sauvegarde importée depuis un fichier.");
+                    
+                } catch (error) {
+                    console.error("Erreur lors de l'import:", error);
+                    showSaveStatus("Erreur : fichier invalide !", "error");
+                }
+            };
+            reader.readAsText(file);
+            
+            event.target.value = '';
+        }
+
+        function showSaveStatus(message, type) {
+            const statusEl = document.getElementById('save-status');
+            statusEl.textContent = message;
+            statusEl.style.color = type === 'success' ? '#4CAF50' : '#F44336';
+            
+            setTimeout(() => {
+                statusEl.textContent = '';
+            }, 3000);
+        }
+
+        function updatePokemonHPList() {
+            const container = document.getElementById('pokemon-hp-list');
+            container.innerHTML = '';
+            
+            pokemons.forEach(pokemon => {
+                const hpPercent = (pokemon.currentHp / pokemon.maxHp) * 100;
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `
+                    <div>
+                        <strong>${pokemon.name}</strong><br>
+                        <small>${pokemon.currentHp.toLocaleString()} / ${pokemon.maxHp.toLocaleString()} PV</small>
+                    </div>
+                    <div style="width: 100px; height: 20px; background: #333; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; background: linear-gradient(90deg, #FF0000, #FFCC00, #4CAF50); width: ${hpPercent}%;"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- GESTION DES MODES D'ATTAQUE ---
+        function setMode(amount) {
+            currentAttackMode = amount;
+            const modes = document.querySelectorAll('.attack-mode-image');
+            modes.forEach(mode => mode.classList.remove('active'));
+            const activeBtn = document.getElementById('mode' + amount);
+            if(activeBtn) activeBtn.classList.add('active');
+            const btn = document.getElementById('manualAttackBtn');
+            btn.innerHTML = `<i class="fas fa-bolt"></i> ATTAQUER (${amount})`;
+        }
+
+        // --- LOGIQUE TIKFINITY ---
+        function toggleConnection() {
+            if (isConnected) {
+                if(tikfinitySocket) tikfinitySocket.close();
+                updateConnectionStatus(false);
+            } else {
+                connectToTikFinity();
+            }
+        }
+        function connectToTikFinity() {
+            updateConnectionStatus('connecting');
+            try {
+                tikfinitySocket = new WebSocket('ws://localhost:8832');
+                tikfinitySocket.onopen = () => {
+                    console.log("Connecté à TikFinity !");
+                    updateConnectionStatus(true);
+                };
+                tikfinitySocket.onmessage = (event) => {
+                    try {
+                        const msg = JSON.parse(event.data);
+                        handleTikFinityMessage(msg);
+                    } catch (e) { console.error("Erreur de parsing TikFinity:", e); }
+                };
+                tikfinitySocket.onclose = () => { updateConnectionStatus(false); };
+                tikfinitySocket.onerror = (err) => {
+                     console.error("Erreur WebSocket TikFinity:", err);
+                    updateConnectionStatus(false);
+                 };
+            } catch (e) { updateConnectionStatus(false); }
+        }
+        function updateConnectionStatus(status) {
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            const btn = document.getElementById('connectBtn');
+            dot.classList.remove('connected', 'disconnected');
+            if (status === true) {
+                isConnected = true; dot.classList.add('connected'); text.textContent = "Connecté"; btn.textContent = "Déconnecter";
+            } else if (status === 'connecting') {
+                text.textContent = "Connexion...";
+            } else {
+                isConnected = false; dot.classList.add('disconnected'); text.textContent = "Déconnecté"; btn.textContent = "Connexion au Live";
+            }
+        }
+        function handleTikFinityMessage(msg) {
+            if (msg.event === 'tiktokAttack') {
+                 const data = msg.data;
+                const userName = data.userName || "Viewer";
+                const damage = parseInt(data.damage) || 1;
+                if (damage === 1 || damage === 10 || damage === 30) {
+                    addToHistory(`⚔️ ${userName} envoie ${damage} coup(s)`);
+                }
+                 addAttackToQueue(userName, damage, data.triggerType);
+            }
+            else if (msg.event === 'like') { 
+                const userName = msg.data.uniqueId || "Viewer";
+                addToHistory(`⚔️ ${userName} envoie 1 coup`);
+                addAttackToQueue(userName, 1, 'like'); 
+            }
+            else if (msg.event === 'gift') {
+                const dmg = (msg.data.diamondCount || 1) * 10;
+                const userName = msg.data.uniqueId || "Viewer";
+                addToHistory(`🎁 ${userName} envoie ${dmg} coups (cadeau)`);
+                addAttackToQueue(userName, dmg, 'gift');
+            }
+        }
+        
+        // --- FILE D'ATTENTE ---
+        function addAttackToQueue(user, damage, type) {
+            let emoji = "⚔️";
+            if (type === 'gift') emoji = "🎁";
+            if (type === 'like') emoji = "❤️";
+            attackQueue.push({ user, damage, emoji });
+            updateQueueUI();
+            if (!isProcessingQueue) processQueue();
+        }
+        function updateQueueUI() {
+            const list = document.getElementById('queue-list');
+            document.getElementById('queue-count').textContent = attackQueue.length;
+            list.innerHTML = '';
+            if (attackQueue.length === 0) {
+                list.innerHTML = '<div style="color: #aaa; font-style:italic; padding: 15px; text-align: center; font-size: 1.8rem;">En attente d\'attaques...</div>';
+            } else {
+                for(let i=0; i < Math.min(attackQueue.length, 5); i++) {
+                    const item = attackQueue[i];
+                    const div = document.createElement('div');
+                    div.className = 'queue-item list-item';
+                    div.innerHTML = `<span>${item.emoji}</span> <b>${item.user}</b>: ${item.damage} coup(s)`;
+                    list.appendChild(div);
+                }
+            }
+        }
+        function processQueue() {
+            if (attackQueue.length === 0) { isProcessingQueue = false; return; }
+            isProcessingQueue = true;
+            const action = attackQueue.shift();
+            updateQueueUI();
+
+            const delay = 2000;
+            
+            performAttack(action.damage, action.user);
+
+            setTimeout(() => { processQueue(); }, delay);
+        }
+
+        // --- LOGIQUE DE COMBAT ---
+        function respawnPokemon(pokemon) {
+            pokemon.currentHp = pokemon.maxHp;
+            pokemon.milestones = {75: false, 50: false, 25: false};
+            
+            if (pokemon.id === "boss") {
+                document.getElementById(`reward-corner-boss`).classList.remove('claimed');
+                document.getElementById(`reward-boss-final`).classList.remove('claimed');
+            } else {
+                const card = document.getElementById(`pokemon${pokemon.id}`);
+                if (card) card.classList.remove('defeated');
+                
+                document.getElementById(`reward-corner-${pokemon.id}`).classList.remove('claimed');
+                document.getElementById(`reward${pokemon.id}-final`).classList.remove('claimed');
+            }
+            
+            [75, 50, 25].forEach(tier => {
+                if (pokemon.id === "boss") {
+                    const marker = document.getElementById(`pb-boss-${tier}`);
+                    const rewardCard = document.getElementById(`reward-boss-${tier}`);
+                    if (marker) marker.classList.remove('claimed');
+                    if (rewardCard) rewardCard.classList.remove('claimed');
+                } else {
+                    const marker = document.getElementById(`pb${pokemon.id}-${tier}`);
+                    const rewardCard = document.getElementById(`reward${pokemon.id}-${tier}`);
+                    if (marker) marker.classList.remove('claimed');
+                    if (rewardCard) rewardCard.classList.remove('claimed');
+                }
+            });
+            
+            updatePokemonDisplay(pokemon);
+            updatePokemonHPList();
+            addToHistory(`✨ ${pokemon.name} est ressuscité ! PV Max : ${pokemon.maxHp.toLocaleString()}`);
+        }
+
+        function performAttack(damageAmount, attackerName) {
+            // Trouver les Pokémon vivants (5 Pokémon au total)
+            const livingPokemons = pokemons.filter(p => p.currentHp > 0);
+            
+            // Si aucun Pokémon n'est vivant, respawn tous les Pokémon
+            if (livingPokemons.length === 0) {
+                addToHistory("🔄 Tous les Pokémon sont KO ! Respawm de tous les Pokémon !");
+                pokemons.forEach(p => respawnPokemon(p));
+                return;
+            }
+
+            // Choisir une cible aléatoire parmi les Pokémon vivants
+            const target = livingPokemons[Math.floor(Math.random() * livingPokemons.length)];
+
+            const actualDmg = Math.min(damageAmount, target.currentHp);
+            target.currentHp -= actualDmg;
+
+            // Animation de dégâts
+            if (target.id === "boss") {
+                createBossDamageAnimation(actualDmg);
+                // Animation rouge pour le boss
+                const bossImage = document.getElementById('boss-image');
+                bossImage.classList.add('hit-anim');
+                setTimeout(() => {
+                    bossImage.classList.remove('hit-anim');
+                }, 500);
+            } else {
+                createDamageAnimation(target.id, actualDmg);
+                // Animation Hit pour les Pokémon normaux
+                const card = document.getElementById(`pokemon${target.id}`);
+                if (card) {
+                    card.classList.remove('hit-anim'); 
+                    void card.offsetWidth; 
+                    card.classList.add('hit-anim');
+                }
+            }
+            
+            updatePokemonDisplay(target);
+            updatePokemonHPList();
+
+            // Le joueur gagne des récompenses proportionnelles aux dégâts
+            const damageReward = Math.floor(actualDmg / 10);
+            addReward(attackerName, damageReward, false, `Dégâts: ${actualDmg}`);
+
+            // Vérifier les paliers
+            checkMilestones(target, attackerName);
+
+            if (target.currentHp <= 0) {
+                // Pokémon KO
+                if (target.id !== "boss") {
+                    const card = document.getElementById(`pokemon${target.id}`);
+                    if (card) card.classList.add('defeated');
+                }
+                addToHistory(`☠️ ${target.name} vaincu par ${attackerName} !`);
+
+                // Récompense KO
+                const killBonus = target.rewards[0].val;
+                addReward(attackerName, killBonus, true, `KO ${target.name}`);
+                
+                if (target.id === "boss") {
+                    createBossRewardAnimation(`+${killBonus.toLocaleString()} 💰`);
+                } else {
+                    createRewardAnimation(target.id, `+${killBonus.toLocaleString()} 💰`);
+                }
+
+                // Jouer le son de KO
+                playSound(KO_SOUND_URL);
+
+                // Mettre à jour l'état visuel des récompenses KO
+                if (target.id === "boss") {
+                    document.getElementById(`reward-corner-boss`).classList.add('claimed');
+                    document.getElementById(`reward-boss-final`).classList.add('claimed');
+                } else {
+                    document.getElementById(`reward-corner-${target.id}`).classList.add('claimed');
+                    document.getElementById(`reward${target.id}-final`).classList.add('claimed');
+                }
+
+                // RESPAWN IMMÉDIAT
+                setTimeout(() => {
+                    respawnPokemon(target);
+                }, 1500);
+
+            } else {
+                // Journal de combat uniquement pour les gros coups
+                if (actualDmg >= 100) addToHistory(`⚔️ ${attackerName} inflige ${actualDmg.toLocaleString()} à ${target.name}`);
+            }
+
+            saveGameData();
+            updateTop3();
+        }
+
+        function checkMilestones(pokemon, attackerName) {
+            const percent = (pokemon.currentHp / pokemon.maxHp) * 100;
+            const tiers = [75, 50, 25];
+
+            tiers.forEach(tier => {
+                if (percent <= tier && !pokemon.milestones[tier]) {
+                    pokemon.milestones[tier] = true;
+
+                    // Marqueur sur la barre de vie
+                    let marker;
+                    if (pokemon.id === "boss") {
+                        marker = document.getElementById(`pb-boss-${tier}`);
+                    } else {
+                        marker = document.getElementById(`pb${pokemon.id}-${tier}`);
+                    }
+                    if(marker) marker.classList.add('claimed');
+
+                    // Carte récompense en bas
+                    let rewardCard;
+                    if (pokemon.id === "boss") {
+                        rewardCard = document.getElementById(`reward-boss-${tier}`);
+                    } else {
+                        rewardCard = document.getElementById(`reward${pokemon.id}-${tier}`);
+                    }
+                    if(rewardCard) rewardCard.classList.add('claimed');
+
+                    // Calcul de la récompense de palier
+                    const rewardData = pokemon.rewards[tier];
+                    const bonus = Math.floor(Math.random() * (rewardData.max - rewardData.min + 1)) + rewardData.min;
+
+                    addReward(attackerName, bonus, true, `Palier ${tier}% ${pokemon.name}`);
+                    
+                    if (pokemon.id === "boss") {
+                        createBossRewardAnimation(`+${bonus} 💰`);
+                    } else {
+                        createRewardAnimation(pokemon.id, `+${bonus} 💰`);
+                    }
+                    
+                    addToHistory(`🎁 ${attackerName} ouvre le Butin ${tier}% de ${pokemon.name} !`);
+
+                    // JOUER LE SON DE LOOT
+                    if (pokemon.id === "boss") {
+                        playSound(BOSS_SOUND_URL);
+                    } else {
+                        playSound(LOOT_SOUND_URL);
+                    }
+                }
+            });
+        }
+        
+        // --- GESTION DES GAINS ET DETTES ---
+        function addReward(user, amount, isSpecialDrop, reason = "") {
+            if (!userWallet[user]) userWallet[user] = 0;
+            userWallet[user] += amount;
+            
+            if (isSpecialDrop) {
+                if (!userDebts[user]) userDebts[user] = 0;
+                userDebts[user] += amount;
+                addToLootHistory(user, amount, reason);
+            }
+            
+            updateTop3();
+            updateDebtsPanel();
+        }
+
+        function payDebt(user) {
+            if (confirm(`Êtes-vous sûr de vouloir marquer la dette de ${user} (${userDebts[user]} pièces) comme payée ?`)) {
+                delete userDebts[user];
+                updateDebtsPanel();
+                addToHistory(`💰 ${user} a payé sa dette !`);
+                saveGameData();
+            }
+        }
+
+        function updateDebtsPanel() {
+            const panel = document.getElementById('debts-content');
+            panel.innerHTML = '';
+            
+            const debtEntries = Object.entries(userDebts);
+            
+            if (debtEntries.length === 0) { 
+                panel.innerHTML = '<div class="list-item" style="font-size: 1.8rem;">Aucune dette enregistrée.</div>'; 
+                return; 
+            }
+            
+            debtEntries.sort((a, b) => b[1] - a[1]).forEach(([user, debt]) => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                div.innerHTML = `
+                    <div>
+                        <strong>${user}</strong>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <span style="color:#FF5555; font-weight:bold; margin-right: 10px;">${debt.toLocaleString()} 💰</span>
+                        <button class="pay-btn" onclick="payDebt('${user}')">Payer</button>
+                    </div>
+                `;
+                panel.appendChild(div);
+            });
+        }
+
+        function updatePokemonDisplay(pokemon) {
+            const hpPercent = (pokemon.currentHp / pokemon.maxHp) * 100;
+            
+            if (pokemon.id === "boss") {
+                // Barre de vie du boss cachée - pas d'affichage visuel
+                
+                // Mettre à jour les marqueurs de butin
+                [75, 50, 25].forEach(tier => {
+                    const marker = document.getElementById(`pb-boss-${tier}`);
+                    if(marker) {
+                        if (pokemon.milestones[tier]) {
+                            marker.classList.add('claimed');
+                        } else {
+                            marker.classList.remove('claimed');
+                        }
+                    }
+                    const rewardCard = document.getElementById(`reward-boss-${tier}`);
+                    if(rewardCard) {
+                         if (pokemon.milestones[tier]) {
+                            rewardCard.classList.add('claimed');
+                        } else {
+                            rewardCard.classList.remove('claimed');
+                        }
+                    }
+                });
+
+                // Mettre à jour l'état KO visuel
+                if (pokemon.currentHp <= 0) {
+                    document.getElementById(`reward-corner-boss`).classList.add('claimed');
+                    document.getElementById(`reward-boss-final`).classList.add('claimed');
+                    document.getElementById('boss-image').style.filter = 'grayscale(0.7) opacity(0.7)';
+                } else {
+                    document.getElementById(`reward-corner-boss`).classList.remove('claimed');
+                    document.getElementById(`reward-boss-final`).classList.remove('claimed');
+                    document.getElementById('boss-image').style.filter = 'drop-shadow(0 0 50px rgba(255, 0, 0, 0.9))';
+                }
+            } else {
+                document.getElementById(`hp${pokemon.id}-bar`).style.width = `${Math.max(0, hpPercent)}%`;
+                
+                const hpBar = document.getElementById(`hp${pokemon.id}-bar`);
+                if (hpPercent <= 25) {
+                    hpBar.style.background = 'linear-gradient(90deg, #FF0000, #FFCC00)';
+                } else if (hpPercent <= 50) {
+                    hpBar.style.background = 'linear-gradient(90deg, #FFCC00, #4CAF50)';
+                } else {
+                    hpBar.style.background = 'linear-gradient(90deg, #FF0000, #FFCC00, #4CAF50)';
+                }
+                
+                // Mettre à jour les marqueurs de butin
+                [75, 50, 25].forEach(tier => {
+                    const marker = document.getElementById(`pb${pokemon.id}-${tier}`);
+                    if(marker) {
+                        if (pokemon.milestones[tier]) {
+                            marker.classList.add('claimed');
+                        } else {
+                            marker.classList.remove('claimed');
+                        }
+                    }
+                    const rewardCard = document.getElementById(`reward${pokemon.id}-${tier}`);
+                    if(rewardCard) {
+                         if (pokemon.milestones[tier]) {
+                            rewardCard.classList.add('claimed');
+                        } else {
+                            rewardCard.classList.remove('claimed');
+                        }
+                    }
+                });
+
+                // Mettre à jour l'état KO
+                const card = document.getElementById(`pokemon${pokemon.id}`);
+                if (pokemon.currentHp <= 0) {
+                    if (card) card.classList.add('defeated');
+                    document.getElementById(`reward-corner-${pokemon.id}`).classList.add('claimed');
+                    document.getElementById(`reward${pokemon.id}-final`).classList.add('claimed');
+                } else {
+                    if (card) card.classList.remove('defeated');
+                    document.getElementById(`reward-corner-${pokemon.id}`).classList.remove('claimed');
+                    document.getElementById(`reward${pokemon.id}-final`).classList.remove('claimed');
+                }
+            }
+        }
+
+        function updateTop3() {
+            const panel = document.getElementById('top3-content');
+            const sortedUsers = Object.entries(userWallet).sort((a, b) => b[1] - a[1]);
+            panel.innerHTML = '';
+            
+            if (sortedUsers.length === 0) { 
+                panel.innerHTML = '<div class="list-item" style="font-size: 1.8rem;">Aucun gain enregistré.</div>'; 
+                return; 
+            }
+            
+            sortedUsers.slice(0, 3).forEach(([user, score], index) => {
+                const div = document.createElement('div');
+                div.className = 'list-item';
+                let medal = index === 0 ? '🥇 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : '';
+                div.innerHTML = `<span>${medal}${user}</span> <span style="color:#FFDE00; font-weight:bold; font-size: 1.8rem;">${score.toLocaleString()} 💰</span>`;
+                panel.appendChild(div);
+            });
+        }
+
+        function addToLootHistory(user, amount, reason) {
+            const panel = document.getElementById('loot-content');
+            const div = document.createElement('div');
+            div.className = 'list-item loot-item';
+            div.innerHTML = `<span>${user}</span> <span>+${amount.toLocaleString()} (${reason})</span>`;
+            panel.insertBefore(div, panel.firstChild);
+            if(panel.children.length > 10) panel.removeChild(panel.lastChild);
+        }
+
+        function createDamageAnimation(pokemonId, dmg) {
+            const card = document.getElementById(`pokemon${pokemonId}`);
+            if (!card) return;
+            
+            const el = document.createElement('div');
+            el.className = 'damage-animation';
+            el.textContent = `-${dmg.toLocaleString()}`;
+            el.style.left = `${20 + Math.random() * 60}%`;
+             el.style.top = `${30 + Math.random() * 40}%`;
+            card.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
+        function createBossDamageAnimation(dmg) {
+            const overlay = document.getElementById('boss-overlay');
+            if (!overlay) return;
+            
+            const el = document.createElement('div');
+            el.className = 'boss-damage-animation';
+            el.textContent = `-${dmg.toLocaleString()}`;
+            el.style.left = `${20 + Math.random() * 60}%`;
+            el.style.top = `${30 + Math.random() * 40}%`;
+            overlay.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
+        function createRewardAnimation(pokemonId, text) {
+            const card = document.getElementById(`pokemon${pokemonId}`);
+            if (!card) return;
+            
+            const el = document.createElement('div');
+            el.className = 'reward-animation';
+            el.textContent = text;
+            el.style.left = '50%'; el.style.top = '50%';
+            card.appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+        }
+
+        function createBossRewardAnimation(text) {
+            const overlay = document.getElementById('boss-overlay');
+            if (!overlay) return;
+            
+            const el = document.createElement('div');
+            el.className = 'boss-reward-animation';
+            el.textContent = text;
+            el.style.left = '50%'; el.style.top = '50%';
+            overlay.appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+        }
+
+        function addToHistory(msg) {
+            const panel = document.getElementById('history-content');
+            const p = document.createElement('div');
+            p.className = 'list-item';
+            p.textContent = `> ${msg}`;
+            panel.insertBefore(p, panel.firstChild);
+            if(panel.children.length > 15) panel.removeChild(panel.lastChild);
+        }
+
+        // --- DRAG AND DROP DES PANNEAUX ---
+        function setupDraggables() {
+            document.querySelectorAll('.draggable-panel').forEach(panel => {
+                const header = panel.querySelector('.panel-header');
+                let isDragging = false, offsetX, offsetY;
+
+                header.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    startDrag(touch.clientX, touch.clientY, panel);
+                }, { passive: true });
+
+                document.addEventListener('touchmove', (e) => {
+                    if (isDragging) {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        drag(touch.clientX, touch.clientY, panel);
+                    }
+                }, { passive: false });
+
+                document.addEventListener('touchend', () => {
+                    isDragging = false;
+                    panel.style.zIndex = 1000;
+                });
+
+                header.addEventListener('mousedown', (e) => {
+                    startDrag(e.clientX, e.clientY, panel);
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (isDragging) {
+                        drag(e.clientX, e.clientY, panel);
+                    }
+                });
+
+                document.addEventListener('mouseup', () => {
+                     isDragging = false;
+                     panel.style.zIndex = 1000;
+                 });
+
+                function startDrag(clientX, clientY, panel) {
+                    isDragging = true;
+                    const rect = panel.getBoundingClientRect();
+                    offsetX = clientX - rect.left;
+                    offsetY = clientY - rect.top;
+                    panel.style.zIndex = 1100;
+                    panel.style.right = 'auto';
+                     panel.style.bottom = 'auto';
+                    panel.style.left = rect.left + 'px';
+                     panel.style.top = rect.top + 'px';
+                }
+                function drag(clientX, clientY, panel) {
+                    panel.style.left = `${clientX - offsetX}px`;
+                    panel.style.top = `${clientY - offsetY}px`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
